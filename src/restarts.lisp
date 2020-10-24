@@ -4,10 +4,13 @@
 
 ;;; Restart definition
 
-(defstruct restart
+(defstruct (restart
+            (:constructor make-restart
+                (name function
+                 &key report-function interactive-function test-function)))
   "A restart structure, implementing the ANSI CL system class RESTART."
-  (name (error "NAME required."))
-  (function (error "FUNCTION required."))
+  (name)
+  (function)
   (report-function nil)
   (interactive-function nil)
   (test-function (constantly t))
@@ -153,8 +156,7 @@ apply the restart functions to them."
 
 (defun restart-bind-transform-binding (binding)
   "Transforms the RESTART-BIND binding into a MAKE-RESTART form."
-  (destructuring-bind (name function . arguments) binding
-    `(make-restart :name ',name :function ,function ,@arguments)))
+  `(make-restart ,@binding))
 
 (defmacro restart-bind (bindings &body body)
   "Executes the body forms in a dynamic context where the newly established
